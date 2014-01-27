@@ -17,3 +17,6 @@
 
 #avoid exposing secret token
 /.secret
+
+#ignore bundler_stubs
+bundler_stubs/
