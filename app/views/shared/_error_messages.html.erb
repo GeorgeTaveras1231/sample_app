@@ -1,0 +1,13 @@
+<% if @user.errors.any? %>
+<% relevant_errors = @user.errors.full_messages.uniq {|msg| msg.split.first} %>
+  <div id="error_explanation">
+    <div class="alert alert-error">
+      The form contains <%= pluralize(relevant_errors.count, "error") %>.
+    </div>
+    <ul>
+    <% relevant_errors.each do |msg| %>
+      <li>* <%= msg %></li>
+    <% end %>
+    </ul>
+  </div>
+<% end %>
