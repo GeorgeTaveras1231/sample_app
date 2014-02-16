@@ -3,18 +3,27 @@ class UsersController < ApplicationController
   before_action :correct_user, only: [:edit, :update]
   before_action :admin_user, only: :destroy
   
+  before_action :new_user, only:[:new, :create]
+  
   def show
     @user = User.find(params[:id])
+    @microposts = @user.microposts.paginate(page: params[:page])
   end
   
   def new
     @user = User.new
   end
   
-  def destroy 
-    User.find(params[:id]).destroy
-    flash[:success] = "User deleted."
-    redirect_to users_url
+  def destroy
+    user = User.find(params[:id])
+    unless user.admin?
+      user.destroy
+      flash[:success] = "User deleted."
+      redirect_to users_url
+    else
+      render "index"
+      flash[:error] = "Cannot delete admin user."
+    end
   end
   
   def index
@@ -28,7 +37,6 @@ class UsersController < ApplicationController
   def create
     @user = User.new(user_params)
     if @user.save
-      #handle a successful save
       sign_in @user
       flash[:success] = "Hi, #{@user.name.split[0]}! Welcome to Sample App!"
       redirect_to @user
@@ -56,10 +64,9 @@ class UsersController < ApplicationController
     redirect_to(root_url) unless current_user.admin?
   end
   
-  def signed_in_user
-    unless signed_in?
-      store_location
-      redirect_to signin_url, notice: "Please sign in."
+  def new_user
+    if signed_in?
+      redirect_to root_url, notice: "You must sign out to create new accounts."
     end
   end
   
